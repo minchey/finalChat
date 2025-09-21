@@ -8,7 +8,7 @@ public class MsgFormat {
     private String body;
     private String timestamp;
 
-    //기본 생성자
+    //기본 생성자 (전체 필드 초기화)
     public MsgFormat(String type, String sender, String receiver, String body, String timestamp){
         this.type = type;
         this.sender = sender;
