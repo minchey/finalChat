@@ -8,7 +8,13 @@ public class MsgFormat {
     private String body;
     private String timestamp;
 
-    //기본 생성자 (전체 필드 초기화)
+    //기본 생성자
+    public MsgFormat(){
+
+        //아무 동작 안함. json 변환 시 필요
+    }
+
+    //전체 필드 초기화
     public MsgFormat(String type, String sender, String receiver, String body, String timestamp){
         this.type = type;
         this.sender = sender;
