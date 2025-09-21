@@ -1,5 +1,10 @@
 package com.securechat.model;
 
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+
+@Data
 public class MsgFormat {
     // 필드 선언
     private String type;
@@ -21,5 +26,21 @@ public class MsgFormat {
         this.receiver = receiver;
         this.body = body;
         this.timestamp = timestamp;
+    }
+
+    public String getType(){
+        return type;
+    }
+
+    public void setType(String type){
+        this.type = type;
+    }
+
+    public String getSender(){
+        return sender;
+    }
+
+    public void setSender(String sender){
+        this.sender = sender;
     }
 }
