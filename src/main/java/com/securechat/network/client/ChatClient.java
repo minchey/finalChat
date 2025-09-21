@@ -1,4 +1,4 @@
-package com.securechat.network;
+package com.securechat.network.client;
 
 import java.net.Socket;
 import java.io.IOException;

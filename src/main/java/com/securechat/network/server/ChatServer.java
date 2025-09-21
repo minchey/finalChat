@@ -1,10 +1,9 @@
-package com.securechat.network;
+package com.securechat.network.server;
 
 import java.net.Socket;
 import java.net.ServerSocket;
 
 import java.io.IOException;
-import java.lang.Thread;
 
 public class ChatServer {
     public static void main(String[] args) {
