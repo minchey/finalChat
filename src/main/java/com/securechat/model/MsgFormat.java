@@ -2,6 +2,7 @@ package com.securechat.model;
 
 import lombok.Data;
 
+//lombok으로 getter, setter, toString 자동 생성
 @Data
 public class MsgFormat {
     // 필드 선언
