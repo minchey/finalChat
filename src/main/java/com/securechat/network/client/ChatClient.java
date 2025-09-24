@@ -14,9 +14,10 @@ public class ChatClient {
             Socket socket = new Socket("localhost",9999);
             PrintWriter out = new PrintWriter(socket.getOutputStream(),true);
             System.out.println("서버에 연결됨: " + socket);
+
             while (true){
-                msg = sc.nextLine();
-                out.println(msg);
+                msg = sc.nextLine(); //메시지 한줄 입력
+                out.println(msg); //서버에 전송
             }
         } catch (IOException e) {
             e.printStackTrace();
