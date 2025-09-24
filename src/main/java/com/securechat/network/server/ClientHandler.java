@@ -21,7 +21,7 @@ public class ClientHandler implements Runnable{
 
         try { //예외처리
             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream(),StandardCharsets.UTF_8) );
-            out = new PrintWriter(clientSocket.getOutputStream(), true);
+            out = new PrintWriter(clientSocket.getOutputStream(),true);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -41,12 +41,15 @@ public class ClientHandler implements Runnable{
                 String line = in.readLine();
                 if (line == null) break;
                 System.out.println("[" + nickname + "] : " + line);
+                ChatServer.broadcast(line);
             }
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
             try {
+                ChatServer.broadcast("[system]: " + nickname + "님이 종료하였습니다.");
                 closeConnection();
+                ChatServer.remove(this);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -54,7 +57,7 @@ public class ClientHandler implements Runnable{
     }
 
     public void sendMessage(String message){ //메시지 전송 메서드
-        out.println(message);
+        if(out != null) out.println(message);
     }
 
 }

@@ -9,7 +9,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class ChatServer {
     private static List<ClientHandler> clients = new CopyOnWriteArrayList<>(); //자바에서 제공하는 스레드 안전 리스트
-    public static void main(String[] args) {
+    public static void main(String[] args){
         try {
             //포트 9999에서 서버열기
             ServerSocket serverSocket = new ServerSocket(9999);
@@ -23,9 +23,10 @@ public class ChatServer {
                 clients.add(handler); //리스트에 추가
 
                 System.out.println("클라이언트 연결됨: " + clientSocket);
-                Thread t = new Thread(new ClientHandler(clientSocket));
+                Thread t = new Thread(handler);
                 t.start();
             }
+
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -37,6 +38,11 @@ public class ChatServer {
         for(ClientHandler c : clients){
             c.sendMessage(message);
         }
+    }
+
+    //접속 종료시 리스트에서 제거
+    public static void remove(ClientHandler handler){
+        clients.remove(handler);
     }
 }
 
