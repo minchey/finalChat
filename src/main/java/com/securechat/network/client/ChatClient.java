@@ -4,6 +4,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.io.IOException;
 import java.util.Scanner;
+import java.util.concurrent.TransferQueue;
 
 public class ChatClient {
     public static void main(String[] args) {
@@ -14,6 +15,9 @@ public class ChatClient {
             Socket socket = new Socket("localhost",9999);
             PrintWriter out = new PrintWriter(socket.getOutputStream(),true);
             System.out.println("서버에 연결됨: " + socket);
+
+            Thread t = new Thread(new ServerMessageReader(socket));
+            t.start();
 
             while (true){
                 msg = sc.nextLine(); //메시지 한줄 입력
