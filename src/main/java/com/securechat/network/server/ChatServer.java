@@ -16,6 +16,8 @@ public class ChatServer {
                 //클라이언트 접속 대기
                 Socket clientSocket = serverSocket.accept();
                 System.out.println("클라이언트 연결됨: " + clientSocket);
+                Thread t = new Thread(new ClientHandler(clientSocket));
+                t.start();
             }
 
         } catch (IOException e) {
