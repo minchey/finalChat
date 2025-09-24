@@ -53,7 +53,7 @@ public class ClientHandler implements Runnable{
         }
     }
 
-    public void sendMessage(String message){
+    public void sendMessage(String message){ //메시지 전송 메서드
         out.println(message);
     }
 

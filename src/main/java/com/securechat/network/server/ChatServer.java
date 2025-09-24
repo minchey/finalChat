@@ -31,5 +31,12 @@ public class ChatServer {
             e.printStackTrace();
         }
     }
+
+    //전체 클라이언트에게 메시지 전송
+    public static void broadcast(String message){
+        for(ClientHandler c : clients){
+            c.sendMessage(message);
+        }
+    }
 }
 
