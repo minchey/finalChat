@@ -1,27 +1,49 @@
 package com.securechat.network.client;
 
+import com.google.gson.Gson;
+import com.securechat.model.MsgFormat;
+import com.securechat.protocol.MsgType;
+import com.securechat.protocol.Protocol;
+
 import java.io.PrintWriter;
+import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.net.Socket;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Scanner;
-import java.util.concurrent.TransferQueue;
-
+import java.time.format.DateTimeFormatter;
 public class ChatClient {
     public static void main(String[] args) {
+        Gson gson = new Gson();           //gson 객체 생성
         Scanner sc = new Scanner(System.in);
         String msg;
+        String nickname;
         try{
             //서버에 연결
             Socket socket = new Socket("localhost",9999);
-            PrintWriter out = new PrintWriter(socket.getOutputStream(),true);
-            System.out.println("서버에 연결됨: " + socket);
+            PrintWriter out = new PrintWriter( //UTF-8 인코딩
+                    new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8), true);
+
+            nickname = sc.nextLine();
+            System.out.println("서버에 연결됨: " + socket + nickname);
 
             Thread t = new Thread(new ServerMessageReader(socket));
             t.start();
 
             while (true){
                 msg = sc.nextLine(); //메시지 한줄 입력
-                out.println(msg); //서버에 전송
+                if(msg.isBlank() || msg.isEmpty()) continue;
+                //timestamp
+                String ts = LocalDateTime.now()
+                        .format(DateTimeFormatter.ofPattern(Protocol.TIMESTAMP_PATTERN));
+
+                // DTO 만들기 (type이 String이라면 name() 사용)
+                MsgFormat message = new MsgFormat(MsgType.CHAT, nickname, "all", msg,ts);
+
+                // JSON 직렬화 및 전송
+                String json = gson.toJson(message);
+                out.println(json);
             }
         } catch (IOException e) {
             e.printStackTrace();
