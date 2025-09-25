@@ -1,12 +1,13 @@
 package com.securechat.model;
 
+import com.securechat.protocol.MsgType;
 import lombok.Data;
 
 //lombok으로 getter, setter, toString 자동 생성
 @Data
 public class MsgFormat {
     // 필드 선언
-    private String type;
+    private MsgType type;
     private String sender;
     private String receiver;
     private String body;
@@ -19,7 +20,7 @@ public class MsgFormat {
     }
 
     //전체 필드 초기화
-    public MsgFormat(String type, String sender, String receiver, String body, String timestamp){
+    public MsgFormat(MsgType type, String sender, String receiver, String body, String timestamp){
         this.type = type;
         this.sender = sender;
         this.receiver = receiver;
