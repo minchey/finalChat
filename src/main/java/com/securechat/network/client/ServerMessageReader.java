@@ -13,7 +13,7 @@ public class ServerMessageReader implements Runnable { //서버에서 수신한 
     //생성자
     public ServerMessageReader(Socket socket) throws IOException {
         this.socket = socket;
-        this.in = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
+        this.in = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8)); //UTF-8로 인코딩
     }
 
     @Override
@@ -27,7 +27,7 @@ public class ServerMessageReader implements Runnable { //서버에서 수신한 
             }
         } catch (IOException e) {
             e.printStackTrace();
-        } finally {
+        } finally { //종료
             try {
                 if (in != null) in.close();
                 if (socket != null && !socket.isClosed()) socket.close();
