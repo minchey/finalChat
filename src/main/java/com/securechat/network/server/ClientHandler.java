@@ -14,13 +14,13 @@ public class ClientHandler implements Runnable {
     private BufferedReader in;
     private PrintWriter out;
     private final String nickname;
-    public Gson gson;
+    private final Gson gson;
 
     //기본 생성자
     public ClientHandler(Socket clientSocket) throws IOException {
         this.clientSocket = clientSocket;
         this.nickname = "Guest";
-
+        this.gson = new Gson();
         in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream(), StandardCharsets.UTF_8));
         out = new PrintWriter(new OutputStreamWriter(clientSocket.getOutputStream(), StandardCharsets.UTF_8), true);
 
@@ -40,14 +40,14 @@ public class ClientHandler implements Runnable {
                 String line = in.readLine();
                 if (line == null) break;
                 try {
-                    MsgFormat stringmsg = gson.fromJson(line, MsgFormat.class);   //이름정 + 검증
-                    if (stringmsg == null || stringmsg.getType() == null) {
+                    MsgFormat msg = gson.fromJson(line, MsgFormat.class);   //이름정 + 검증
+                    if (msg == null || msg.getType() == null) {
                         // 형식 불량 방어: 무시하거나 경고 로그만 남김
                         System.err.println("[ClientHandler] invalid JSON from " + nickname + ": " + line);
                         continue;
 
                     }
-                    System.out.println("[" + nickname + "][" + stringmsg.getType() + "] " + line);
+                    System.out.println("[" + nickname + "][" + msg.getType() + "] " + line);
                     ChatServer.broadcast(line);
                 } catch (com.google.gson.JsonSyntaxException je) {
                     System.err.println("[ClientHandler] JSON parse error from " + nickname + ": " + je.getMessage());
