@@ -1,5 +1,9 @@
 package com.securechat.network.server;
 
+import com.google.gson.Gson;
+import com.securechat.model.MsgFormat;
+import com.securechat.protocol.MsgType;
+
 import java.io.*;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
@@ -10,9 +14,10 @@ public class ClientHandler implements Runnable {
     private BufferedReader in;
     private PrintWriter out;
     private final String nickname;
+    public Gson gson;
 
     //기본 생성자
-    public ClientHandler(Socket clientSocket) throws IOException{
+    public ClientHandler(Socket clientSocket) throws IOException {
         this.clientSocket = clientSocket;
         this.nickname = "Guest";
 
@@ -34,8 +39,21 @@ public class ClientHandler implements Runnable {
             while (true) {
                 String line = in.readLine();
                 if (line == null) break;
-                System.out.println("[" + nickname + "] : " + line);
-                ChatServer.broadcast(line);
+                try {
+                    MsgFormat stringmsg = gson.fromJson(line, MsgFormat.class);   //이름정 + 검증
+                    if (stringmsg == null || stringmsg.getType() == null) {
+                        // 형식 불량 방어: 무시하거나 경고 로그만 남김
+                        System.err.println("[ClientHandler] invalid JSON from " + nickname + ": " + line);
+                        continue;
+
+                    }
+                    System.out.println("[" + nickname + "][" + stringmsg.getType() + "] " + line);
+                    ChatServer.broadcast(line);
+                } catch (com.google.gson.JsonSyntaxException je) {
+                    System.err.println("[ClientHandler] JSON parse error from " + nickname + ": " + je.getMessage());
+                    continue; // 해당 라인만 스킵하고 루프 유지
+                }
+
             }
         } catch (IOException e) {
             System.err.println("[ClientHandler] IO error for " + clientSocket + ": " + e.getMessage());
@@ -43,7 +61,16 @@ public class ClientHandler implements Runnable {
             try {
                 closeConnection();
                 ChatServer.remove(this);
-                ChatServer.broadcast("[system]: " + nickname + "님이 종료하였습니다.");
+                MsgFormat sys = new MsgFormat(
+                        MsgType.SYSTEM,               // type
+                        "system",               // sender
+                        "all",                  // receiver
+                        nickname + "님이 종료하였습니다.", // body
+                        java.time.LocalDateTime.now().format(
+                                java.time.format.DateTimeFormatter.ofPattern(com.securechat.protocol.Protocol.TIMESTAMP_PATTERN)
+                        )
+                );
+                ChatServer.broadcast(gson.toJson(sys));
             } catch (IOException e) {
                 System.err.println("[ClientHandler] IO error for " + clientSocket + ": " + e.getMessage());
             }
