@@ -52,5 +52,10 @@ public class ChatServer {
     public static void appendHistory(MsgFormat msg){
         history.add(msg);
     }
+
+    //히스토리 리스트 조회
+    public static List<MsgFormat> getAllHistory(){
+        return history;
+    }
 }
 

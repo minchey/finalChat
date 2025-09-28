@@ -2,6 +2,7 @@ package com.securechat.network.server;
 
 import com.securechat.model.MsgFormat;
 import com.securechat.network.server.service.ChatService;
+import com.securechat.network.server.service.HistoryService;
 
 public class MsgDispatcher {
     public static void dispatch(MsgFormat msg) {

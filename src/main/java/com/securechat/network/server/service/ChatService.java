@@ -6,10 +6,12 @@ import com.google.gson.Gson;
 
 public class ChatService {
     public static void handle(MsgFormat msg){
-        try{
-            if(msg.getType() == MsgType.CHAT && msg.getBody() != null){
+        try {
+            if (msg.getType() == MsgType.CHAT && msg.getBody() != null) {
 
             }
         }
+    }catch(Exception e){
+        e.printStackTrace();
     }
 }
