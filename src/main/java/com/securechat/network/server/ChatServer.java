@@ -1,5 +1,7 @@
 package com.securechat.network.server;
 
+import com.securechat.model.MsgFormat;
+
 import java.net.Socket;
 import java.net.ServerSocket;
 
@@ -8,6 +10,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class ChatServer {
+    private static final List<MsgFormat> history = new CopyOnWriteArrayList<>(); //히스토리 저장소
     private static List<ClientHandler> clients = new CopyOnWriteArrayList<>(); //자바에서 제공하는 스레드 안전 리스트
     public static void main(String[] args){
         try {
@@ -43,6 +46,11 @@ public class ChatServer {
     //접속 종료시 리스트에서 제거
     public static void remove(ClientHandler handler){
         clients.remove(handler);
+    }
+
+    //히스토리 리스트에 추가
+    public static void appendHistory(MsgFormat msg){
+        history.add(msg);
     }
 }
 
