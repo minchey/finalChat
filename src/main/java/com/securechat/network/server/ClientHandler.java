@@ -17,9 +17,9 @@ public class ClientHandler implements Runnable {
     private final Gson gson;
 
     //기본 생성자
-    public ClientHandler(Socket clientSocket) throws IOException {
+    public ClientHandler(Socket clientSocket, String nickname) throws IOException {
         this.clientSocket = clientSocket;
-        this.nickname = "Guest";
+        this.nickname = nickname;
         this.gson = new Gson();
         in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream(), StandardCharsets.UTF_8));
         out = new PrintWriter(new OutputStreamWriter(clientSocket.getOutputStream(), StandardCharsets.UTF_8), true);

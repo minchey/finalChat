@@ -25,6 +25,7 @@ public class ChatClient {
             PrintWriter out = new PrintWriter( //UTF-8 인코딩
                     new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8), true);
 
+            System.out.println("닉네임: ");
             nickname = sc.nextLine();
             System.out.println("서버에 연결됨: " + socket + nickname);
 
