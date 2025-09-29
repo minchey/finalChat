@@ -10,8 +10,8 @@ public class ChatService {
             if (msg.getType() == MsgType.CHAT && msg.getBody() != null) {
 
             }
+        }catch(Exception e){
+            e.printStackTrace();
         }
-    }catch(Exception e){
-        e.printStackTrace();
     }
 }
