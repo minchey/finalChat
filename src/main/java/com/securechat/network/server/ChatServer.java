@@ -1,12 +1,16 @@
 package com.securechat.network.server;
 
 import com.securechat.model.MsgFormat;
+import com.securechat.protocol.MsgType;
 import com.securechat.network.client.ChatClient;
+import com.securechat.protocol.Protocol;
 
 import java.net.Socket;
 import java.net.ServerSocket;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -27,6 +31,8 @@ public class ChatServer {
             while (true) {
                 //클라이언트 접속 대기
                 Socket clientSocket = serverSocket.accept();
+                String ts = LocalDateTime.now()
+                        .format(DateTimeFormatter.ofPattern(Protocol.TIMESTAMP_PATTERN));
 
                 // 📥 접속 직후 첫 줄에서 닉네임 받기
                 BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream(), StandardCharsets.UTF_8));
@@ -38,6 +44,9 @@ public class ChatServer {
                 System.out.println("클라이언트 연결됨: " + clientSocket);
                 Thread t = new Thread(handler);
                 t.start();
+                MsgFormat auto = new MsgFormat(MsgType.HISTORY, nickname, "server", "auto", ts);
+
+                MsgDispatcher.dispatch(auto);
             }
 
 
