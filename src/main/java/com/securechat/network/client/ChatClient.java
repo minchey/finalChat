@@ -29,6 +29,10 @@ public class ChatClient {
             nickname = sc.nextLine();
             System.out.println("서버에 연결됨: " + socket + nickname);
 
+            //닉네임 전송
+            out.println(nickname);
+
+            //스레드 시작
             Thread t = new Thread(new ServerMessageReader(socket));
             t.start();
 

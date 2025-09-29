@@ -14,12 +14,12 @@ public class MsgDispatcher {
                 HistoryService.handle(msg);
                 break;
             case KEY_EXCHANGE:
-                KeyService.handle(msg);
+                //KeyService.handle(msg);
                 break;
             case SYSTEM:
-                SystemService.handle(msg);
+               // SystemService.handle(msg);
                 break;
-            default -> System.out.println("❗Unknown type: " + msg.getType());
+           // default -> System.out.println("❗Unknown type: " + msg.getType());
         }
     }
 }

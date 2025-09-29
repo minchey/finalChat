@@ -68,6 +68,7 @@ public class ChatServer {
         return history;
     }
 
+    //닉넹임 받고 메시지 반환
     public static void sendTo(String nickname, String message){
         ClientHandler target = clients.get(nickname);
         if(target != null) target.sendMessage(message);
