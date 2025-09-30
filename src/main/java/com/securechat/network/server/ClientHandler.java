@@ -48,7 +48,8 @@ public class ClientHandler implements Runnable {
 
                     }
                     System.out.println("[" + nickname + "][" + msg.getType() + "] " + line);
-                    ChatServer.broadcast(line);
+                    //ChatServer.broadcast(line);
+                    MsgDispatcher.dispatch(msg); // ✅ 타입별 처리
                 } catch (com.google.gson.JsonSyntaxException je) {
                     System.err.println("[ClientHandler] JSON parse error from " + nickname + ": " + je.getMessage());
                     continue; // 해당 라인만 스킵하고 루프 유지
@@ -60,7 +61,7 @@ public class ClientHandler implements Runnable {
         } finally {
             try {
                 closeConnection();
-                ChatServer.remove(this);
+                ChatServer.remove(this.nickname);
                 MsgFormat sys = new MsgFormat(
                         MsgType.SYSTEM,               // type
                         "system",               // sender

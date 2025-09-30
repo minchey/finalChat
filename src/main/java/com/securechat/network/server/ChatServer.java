@@ -2,7 +2,6 @@ package com.securechat.network.server;
 
 import com.securechat.model.MsgFormat;
 import com.securechat.protocol.MsgType;
-import com.securechat.network.client.ChatClient;
 import com.securechat.protocol.Protocol;
 
 import java.net.Socket;
@@ -63,8 +62,8 @@ public class ChatServer {
     }
 
     //접속 종료시 리스트에서 제거
-    public static void remove(ClientHandler handler){
-        clients.remove(handler);
+    public static void remove(String nickname ){
+        clients.remove(nickname);
     }
 
     //히스토리 리스트에 추가
