@@ -11,6 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.net.Socket;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Scanner;
 import java.time.format.DateTimeFormatter;
 public class ChatClient {
@@ -19,12 +20,30 @@ public class ChatClient {
         Scanner sc = new Scanner(System.in);
         String msg;
         String nickname;
+        int signupOrLogin;
         try{
             //서버에 연결
             Socket socket = new Socket("localhost",9999);
             PrintWriter out = new PrintWriter( //UTF-8 인코딩
                     new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8), true);
 
+            System.out.println("1.회원가입 2.로그인");
+            signupOrLogin = sc.nextInt();
+            sc.nextLine(); // 엔터 제거
+            if(signupOrLogin == 1){
+                System.out.println("아이디를 입력하세요 : ");
+                String id = sc.nextLine().trim();
+                System.out.println("비밀번호를 입력하세요 : ");
+                String pw = sc.nextLine();
+                String body = gson.toJson(Map.of("id",id,"password",pw)); //id + pw 해시저장
+                MsgFormat signUp = new MsgFormat(
+                        MsgType.SIGNUP,
+                        id,
+                        "server",
+                        body,
+                        LocalDateTime.now().format(DateTimeFormatter.ofPattern(Protocol.TIMESTAMP_PATTERN)));
+                out.println(gson.toJson(signUp));
+            }
             System.out.println("닉네임: ");
             nickname = sc.nextLine();
             //닉네임 전송
