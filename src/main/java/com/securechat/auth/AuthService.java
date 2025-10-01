@@ -25,6 +25,10 @@ public class AuthService {
             sendErr(msg.getSender(), "INVALID_JSON");
             return;
         }
+        if (p == null || isBlank(p.id) || isBlank(p.pw)) {
+            sendErr(msg.getSender(), "MISSING_FIELDS");
+            return;
+        }
 
     }
 
@@ -52,6 +56,11 @@ public class AuthService {
                 nowTs()
         );
         ChatServer.sendTo(receiver, gson.toJson(err));
+    }
+
+    //빈 값 확인 메서드
+    private static boolean isBlank(String s) {
+        return s == null || s.trim().isEmpty();
     }
 
     //시간 메서드
