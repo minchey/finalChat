@@ -3,7 +3,6 @@ package com.securechat.auth;
 import com.securechat.network.server.ChatServer;
 import com.securechat.protocol.MsgType;
 import com.securechat.protocol.Protocol;
-import com.google.common.hash.HashCode;
 import com.google.gson.JsonSyntaxException;
 import com.securechat.model.MsgFormat;
 import com.google.common.hash.Hashing;
@@ -11,23 +10,29 @@ import com.google.gson.Gson;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.nio.charset.StandardCharsets;
+import com.securechat.auth.store.UserStore;  //유저 저장소
+
 
 public class AuthService {
 
     private static final Gson gson = new Gson();
     public static void handleSignup(MsgFormat msg){
-        SignupPayLoad p;
+        SignupPayload p;
         try {
             // body: {"id": "minchey", "password": "1234"}
-            p = gson.fromJson(msg.getBody(),SignupPayLoad.class);
+            p = gson.fromJson(msg.getBody(),SignupPayload.class);
         }catch (JsonSyntaxException e){
             sendErr(msg.getSender(), "INVALID_JSON");
             return;
         }
-        if (p == null || isBlank(p.id) || isBlank(p.pw)) {
+        if (p == null || isBlank(p.id) || isBlank(p.password)) {
             sendErr(msg.getSender(), "MISSING_FIELDS");
             return;
         }
+
+        //비밀번호 해시
+        String hashPw = Hashing.sha256().hashString(p.password,StandardCharsets.UTF_8).toString();
 
     }
 
@@ -68,9 +73,9 @@ public class AuthService {
     }
 
     //DTO
-    public class SignupPayLoad {
+    public static class SignupPayload {
         public String id;
-        public String pw;
+        public String password;
     }
 }
 
