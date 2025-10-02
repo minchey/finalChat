@@ -34,6 +34,16 @@ public class AuthService {
         //비밀번호 해시
         String hashPw = Hashing.sha256().hashString(p.password,StandardCharsets.UTF_8).toString();
 
+        boolean created = UserStore.putIfAbsent(p.id, hashPw);
+        if (!created) {
+            // 이미 존재하는 아이디
+            sendErr(p.id, "DUPLICATE_ID");
+            return;
+        }
+
+        // 가입 성공 응답
+        sendOk(p.id, "SIGNUP_OK");
+
     }
 
     // ---------- helpers ----------
