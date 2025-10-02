@@ -1,5 +1,6 @@
 package com.securechat.network.server;
 
+import com.securechat.auth.AuthService;
 import com.securechat.model.MsgFormat;
 import com.securechat.network.server.service.ChatService;
 import com.securechat.network.server.service.HistoryService;
@@ -10,6 +11,8 @@ public class MsgDispatcher {
             case CHAT:
                 ChatService.handle(msg);
                 break;
+            case SIGNUP:
+                AuthService.handleSignup(msg);
             case HISTORY:
                 HistoryService.handle(msg);
                 break;
