@@ -11,7 +11,6 @@ import com.google.gson.Gson;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.nio.charset.StandardCharsets;
 
 public class AuthService {
 
@@ -19,7 +18,7 @@ public class AuthService {
     public static void handleSignup(MsgFormat msg){
         SignupPayLoad p;
         try {
-            // body: {"id": "minjae", "password": "1234"}
+            // body: {"id": "minchey", "password": "1234"}
             p = gson.fromJson(msg.getBody(),SignupPayLoad.class);
         }catch (JsonSyntaxException e){
             sendErr(msg.getSender(), "INVALID_JSON");
@@ -68,6 +67,11 @@ public class AuthService {
         return LocalDateTime.now().format(DateTimeFormatter.ofPattern(Protocol.TIMESTAMP_PATTERN));
     }
 
+    //DTO
+    public class SignupPayLoad {
+        public String id;
+        public String pw;
+    }
 }
 
 
