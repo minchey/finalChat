@@ -11,8 +11,8 @@ import java.nio.charset.StandardCharsets;
 public class ClientHandler implements Runnable {
     //필드
     private final Socket clientSocket;
-    private BufferedReader in;
-    private PrintWriter out;
+    private final BufferedReader in;
+    private final PrintWriter out;
     private final String nickname;
     private final Gson gson;
 
