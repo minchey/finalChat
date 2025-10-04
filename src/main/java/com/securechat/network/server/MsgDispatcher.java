@@ -8,15 +8,15 @@ import com.securechat.network.server.service.HistoryService;
 public class MsgDispatcher {
     public static void dispatch(MsgFormat msg) {
         switch (msg.getType()) {
-            case CHAT:
+            case CHAT:                              //채팅 핸들러
                 ChatService.handle(msg);
                 break;
-            case SIGNUP:
+            case SIGNUP:                            //회원가입 핸들러
                 AuthService.handleSignup(msg);
-            case HISTORY:
+            case HISTORY:                           //히스토리 핸들러
                 HistoryService.handle(msg);
                 break;
-            case KEY_EXCHANGE:
+            case KEY_EXCHANGE:                      //공개키 교환 핸들러
                 //KeyService.handle(msg);
                 break;
             case SYSTEM:
