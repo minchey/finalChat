@@ -35,7 +35,9 @@ public class ChatClient {
                 String id = sc.nextLine().trim();
                 System.out.println("비밀번호를 입력하세요 : ");
                 String pw = sc.nextLine();
-                String body = gson.toJson(Map.of("id",id,"password",pw)); //id + pw 해시저장
+                System.out.println("닉네임을 입력하세요 : ");
+                String nicknameForAuth = sc.nextLine().trim();
+                String body = gson.toJson(Map.of("id", id, "password", pw, "nickname", nicknameForAuth)); //id + pw 해시저장
                 MsgFormat signUp = new MsgFormat(
                         MsgType.SIGNUP,
                         id,
