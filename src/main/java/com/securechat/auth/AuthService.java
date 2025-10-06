@@ -86,6 +86,14 @@ public class AuthService {
     public static class SignupPayload {
         public String id;
         public String password;
+        public String nickname;
+    }
+
+    //로그인 DTO
+    public static class LoginPayload{
+        public String id;
+        public String password;
+        public String nickname;
     }
 }
 
