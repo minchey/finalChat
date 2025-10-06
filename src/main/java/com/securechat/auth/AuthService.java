@@ -26,7 +26,7 @@ public class AuthService {
             sendErr(msg.getSender(), "INVALID_JSON");
             return;
         }
-        if (p == null || isBlank(p.id) || isBlank(p.password)) {
+        if (p == null || isBlank(p.id) || isBlank(p.password) || isBlank(p.nickname)) {
             sendErr(msg.getSender(), "MISSING_FIELDS");
             return;
         }
