@@ -3,6 +3,7 @@ package com.securechat.auth.store;
 import java.util.concurrent.ConcurrentHashMap;
 public class UserStore {
 
+
     //  회원 정보를 저장할 "메모리 기반 데이터베이스" 역할
     //  key   : 회원 아이디 (String)
     //  value : 해시된 비밀번호 (String)
