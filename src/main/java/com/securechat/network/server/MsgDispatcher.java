@@ -22,7 +22,12 @@ public class MsgDispatcher {
             case SYSTEM:
                // SystemService.handle(msg);
                 break;
-           // default -> System.out.println("❗Unknown type: " + msg.getType());
+
+            case LOGIN:
+                // com.securechat.network.server.MsgDispatcher
+                AuthService.handleLogin(msg);
+                break;
+                // default -> System.out.println("❗Unknown type: " + msg.getType());
         }
     }
 }
