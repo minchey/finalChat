@@ -11,18 +11,20 @@ import com.google.gson.Gson;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.nio.charset.StandardCharsets;
+
 import com.securechat.auth.store.UserStore;  //유저 저장소
 
 
 public class AuthService {
 
     private static final Gson gson = new Gson();
-    public static void handleSignup(MsgFormat msg){
+
+    public static void handleSignup(MsgFormat msg) {
         SignupPayload p;
         try {
             // body: {"id": "minchey", "password": "1234"}
-            p = gson.fromJson(msg.getBody(),SignupPayload.class);
-        }catch (JsonSyntaxException e){
+            p = gson.fromJson(msg.getBody(), SignupPayload.class);
+        } catch (JsonSyntaxException e) {
             sendErr(msg.getSender(), "INVALID_JSON");
             return;
         }
@@ -32,7 +34,7 @@ public class AuthService {
         }
 
         //비밀번호 해시
-        String hashPw = Hashing.sha256().hashString(p.password,StandardCharsets.UTF_8).toString();
+        String hashPw = Hashing.sha256().hashString(p.password, StandardCharsets.UTF_8).toString();
 
         boolean created = UserStore.putIfAbsent(p.id, hashPw);
         if (!created) {
@@ -90,13 +92,13 @@ public class AuthService {
     }
 
     //로그인 DTO
-    public static class LoginPayload{
+    public static class LoginPayload {
         public String id;
         public String password;
         public String nickname;
     }
 
-    public static void handlelogin(MsgFormat msg){
+    public static void handlelogin(MsgFormat msg) {
         LoginPayload p;
         try {
             p = gson.fromJson(msg.getBody(), LoginPayload.class);
@@ -111,7 +113,30 @@ public class AuthService {
             return;
         }
         System.out.println("[LOGIN] request id=" + p.id);
-        // 여기서 바로 리턴 (검증/응답은 Step 2에서 넣자)
+
+        // 아이디가 존재하는지 확인
+        if (!UserStore.exists(p.id)) {
+            sendErr(p.id, "USER_NOT_FOUND");
+            return;
+        }
+
+        // 저장된 해시값 꺼내기
+        String storedHash = UserStore.getHashedPassword(p.id);
+
+        // 입력받은 비밀번호 해시화
+        String inputHash = Hashing.sha256()
+                .hashString(p.password, StandardCharsets.UTF_8)
+                .toString();
+
+        // 비교해서 다르면 실패
+        if (!storedHash.equals(inputHash)) {
+            sendErr(p.id, "WRONG_PASSWORD");
+            return;
+        }
+
+        // ✅ 여기까지 왔다면 로그인 성공!
+        sendOk(p.id, "LOGIN_OK");
+
     }
 }
 
