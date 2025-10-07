@@ -37,7 +37,7 @@ public class ChatServer {
                 BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream(), StandardCharsets.UTF_8));
                 String nickname = in.readLine();  // 클라이언트가 먼저 닉네임 전송
 
-                ClientHandler handler = new ClientHandler(clientSocket,nickname);
+                ClientHandler handler = new ClientHandler(clientSocket);
                 clients.put(nickname,handler); //리스트에 추가
 
                 System.out.println("클라이언트 연결됨: " + clientSocket);
