@@ -98,7 +98,7 @@ public class AuthService {
         public String nickname;
     }
 
-    public static void handlelogin(MsgFormat msg) {
+    public static void handleLogin(MsgFormat msg) {
         LoginPayload p;
         try {
             p = gson.fromJson(msg.getBody(), LoginPayload.class);

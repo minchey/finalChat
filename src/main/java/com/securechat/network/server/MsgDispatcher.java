@@ -4,7 +4,7 @@ import com.securechat.auth.AuthService;
 import com.securechat.model.MsgFormat;
 import com.securechat.network.server.service.ChatService;
 import com.securechat.network.server.service.HistoryService;
-
+import com.securechat.auth.AuthService;
 public class MsgDispatcher {
     public static void dispatch(MsgFormat msg) {
         switch (msg.getType()) {
