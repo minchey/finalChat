@@ -95,6 +95,24 @@ public class AuthService {
         public String password;
         public String nickname;
     }
+
+    public static void handlelogin(MsgFormat msg){
+        LoginPayload p;
+        try {
+            p = gson.fromJson(msg.getBody(), LoginPayload.class);
+        } catch (JsonSyntaxException e) {
+            System.err.println("[LOGIN] INVALID_JSON from " + msg.getSender());
+            sendErr(msg.getSender(), "INVALID_JSON");
+            return;
+        }
+        if (p == null || isBlank(p.id) || isBlank(p.password)) {
+            System.err.println("[LOGIN] MISSING_FIELDS from " + msg.getSender());
+            sendErr(msg.getSender(), "MISSING_FIELDS");
+            return;
+        }
+        System.out.println("[LOGIN] request id=" + p.id);
+        // 여기서 바로 리턴 (검증/응답은 Step 2에서 넣자)
+    }
 }
 
 
