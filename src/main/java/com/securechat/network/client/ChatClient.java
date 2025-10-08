@@ -19,7 +19,7 @@ public class ChatClient {
         Gson gson = new Gson();           //gson 객체 생성
         Scanner sc = new Scanner(System.in);
         String msg;
-        String nickname;
+        String nicknameForAuth;
         int signupOrLogin;
         try{
             //서버에 연결
@@ -36,8 +36,8 @@ public class ChatClient {
                 System.out.println("비밀번호를 입력하세요 : ");
                 String pw = sc.nextLine();
                 System.out.println("닉네임을 입력하세요 : ");
-                String nicknameForAuth = sc.nextLine().trim();
-                String body = gson.toJson(Map.of("id", id, "password", pw, "nickname", nicknameForAuth)); //id + pw 해시저장
+                nicknameForAuth = sc.nextLine().trim();
+                String body = gson.toJson(Map.of("id", id, "password", pw, "nickname", nicknameForAuth)); //id + pw 해시저장 + 닉네임
                 MsgFormat signUp = new MsgFormat(
                         MsgType.SIGNUP,
                         id,
@@ -46,11 +46,11 @@ public class ChatClient {
                         LocalDateTime.now().format(DateTimeFormatter.ofPattern(Protocol.TIMESTAMP_PATTERN)));
                 out.println(gson.toJson(signUp));
             }
-            System.out.println("닉네임: ");
-            nickname = sc.nextLine();
+            //System.out.println("닉네임: ");
+            String nickname = nicknameForAuth;
             //닉네임 전송
-            out.println(nickname);
-            System.out.println("서버에 연결됨: " + socket + nickname);
+            out.println();
+            System.out.println("서버에 연결됨: " + socket + nicknameForAuth);
 
             //스레드 시작
             Thread t = new Thread(new ServerMessageReader(socket));
