@@ -19,7 +19,7 @@ public class ChatClient {
         Gson gson = new Gson();           //gson 객체 생성
         Scanner sc = new Scanner(System.in);
         String msg;
-        String nicknameForAuth;
+        String nicknameForAuth ="";
         int signupOrLogin;
         try{
             //서버에 연결
