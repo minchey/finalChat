@@ -82,4 +82,7 @@ public class ClientHandler implements Runnable {
         if (out != null) out.println(message);
     }
 
+    public void bindNickname(String nickname){
+        this.nickname = nickname;
+    }
 }
