@@ -6,7 +6,7 @@ import com.securechat.network.server.service.ChatService;
 import com.securechat.network.server.service.HistoryService;
 import com.securechat.auth.AuthService;
 public class MsgDispatcher {
-    public static void dispatch(MsgFormat msg) {
+    public static void dispatch(MsgFormat msg, ClientHandler clientHandler) {
         switch (msg.getType()) {
             case CHAT:                              //채팅 핸들러
                 ChatService.handle(msg);
@@ -25,7 +25,7 @@ public class MsgDispatcher {
 
             case LOGIN:
                 // com.securechat.network.server.MsgDispatcher
-                AuthService.handleLogin(msg);
+                AuthService.handleLogin(msg, clientHandler);
                 break;
                 // default -> System.out.println("❗Unknown type: " + msg.getType());
         }
