@@ -1,6 +1,7 @@
 package com.securechat.auth;
 
 import com.securechat.network.server.ChatServer;
+import com.securechat.network.server.ClientHandler;
 import com.securechat.protocol.MsgType;
 import com.securechat.protocol.Protocol;
 import com.google.gson.JsonSyntaxException;
@@ -98,7 +99,7 @@ public class AuthService {
         public String nickname;
     }
 
-    public static void handleLogin(MsgFormat msg) {
+    public static void handleLogin(MsgFormat msg, ClientHandler handler) {
         LoginPayload p;
         try {
             p = gson.fromJson(msg.getBody(), LoginPayload.class);
