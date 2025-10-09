@@ -82,5 +82,9 @@ public class ChatServer {
         if(target != null) target.sendMessage(message);
         else System.err.println("클라이언트 없음: " + nickname);
     }
+
+    public static void bind(String id, ClientHandler handler){
+        clients.put(id,handler);
+    }
 }
 
