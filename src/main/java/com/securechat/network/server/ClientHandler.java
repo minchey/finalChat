@@ -15,6 +15,8 @@ public class ClientHandler implements Runnable {
     private final PrintWriter out;
     private final Gson gson;
 
+    private String nickname;
+
     //기본 생성자
     public ClientHandler(Socket clientSocket) throws IOException {
         this.clientSocket = clientSocket;
