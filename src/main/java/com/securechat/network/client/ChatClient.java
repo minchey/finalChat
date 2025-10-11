@@ -46,10 +46,31 @@ public class ChatClient {
                         LocalDateTime.now().format(DateTimeFormatter.ofPattern(Protocol.TIMESTAMP_PATTERN)));
                 out.println(gson.toJson(signUp));
             }
-            //System.out.println("닉네임: ");
-            String nickname = nicknameForAuth;
-            //닉네임 전송
-            out.println();
+
+            //로그인 분기
+            if(signupOrLogin == 2){
+                System.out.println("아이디를 입력하세요: ");
+                String id = sc.nextLine().trim();
+                System.out.println("비밀번호를 입력하세요");
+                String pw = sc.nextLine();
+
+                String body = gson.toJson(java.util.Map.of(
+                        "id", id,
+                        "pw", pw
+                ));
+
+                MsgFormat login = new MsgFormat(
+                        MsgType.LOGIN,
+                        id,
+                        "server",
+                        body,
+                        java.time.LocalDateTime.now().format(
+                                java.time.format.DateTimeFormatter.ofPattern(Protocol.TIMESTAMP_PATTERN)
+                        )
+                );
+                out.println(gson.toJson(login));
+            }
+
             System.out.println("서버에 연결됨: " + socket + nicknameForAuth);
 
             //스레드 시작
