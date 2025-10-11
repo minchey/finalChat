@@ -45,7 +45,7 @@ public class ChatServer {
                 t.start();
                 MsgFormat auto = new MsgFormat(MsgType.HISTORY, nickname, "server", "auto", ts);
 
-                MsgDispatcher.dispatch(auto);
+                MsgDispatcher.dispatch(auto, handler);
             }
 
 
