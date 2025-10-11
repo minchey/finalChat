@@ -20,6 +20,7 @@ public class ChatClient {
         Scanner sc = new Scanner(System.in);
         String msg;
         String nicknameForAuth ="";
+        String userId = null;
         int signupOrLogin;
         try{
             //서버에 연결
@@ -30,6 +31,8 @@ public class ChatClient {
             System.out.println("1.회원가입 2.로그인");
             signupOrLogin = sc.nextInt();
             sc.nextLine(); // 엔터 제거
+
+            //회원가입 분기
             if(signupOrLogin == 1){
                 System.out.println("아이디를 입력하세요 : ");
                 String id = sc.nextLine().trim();
@@ -45,6 +48,7 @@ public class ChatClient {
                         body,
                         LocalDateTime.now().format(DateTimeFormatter.ofPattern(Protocol.TIMESTAMP_PATTERN)));
                 out.println(gson.toJson(signUp));
+                userId = id;
             }
 
             //로그인 분기
@@ -56,7 +60,7 @@ public class ChatClient {
 
                 String body = gson.toJson(java.util.Map.of(
                         "id", id,
-                        "pw", pw
+                        "password", pw
                 ));
 
                 MsgFormat login = new MsgFormat(
@@ -69,10 +73,10 @@ public class ChatClient {
                         )
                 );
                 out.println(gson.toJson(login));
+                userId = id;
             }
 
-            System.out.println("서버에 연결됨: " + socket + nicknameForAuth);
-
+            System.out.println("서버에 연결됨: " + socket + " as " + (userId != null ? userId : ""));
             //스레드 시작
             Thread t = new Thread(new ServerMessageReader(socket));
             t.start();
@@ -85,7 +89,7 @@ public class ChatClient {
                         .format(DateTimeFormatter.ofPattern(Protocol.TIMESTAMP_PATTERN));
 
                 // DTO 만들기 (type이 String이라면 name() 사용)
-                MsgFormat message = new MsgFormat(MsgType.CHAT, nickname, "all", msg,ts);
+                MsgFormat message = new MsgFormat(MsgType.CHAT, userId, "all", msg,ts);
 
                 // JSON 직렬화 및 전송
                 String json = gson.toJson(message);

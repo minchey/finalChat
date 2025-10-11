@@ -7,7 +7,9 @@ import com.securechat.protocol.MsgType;
 import java.io.*;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import lombok.Getter;
 
+@Getter
 public class ClientHandler implements Runnable {
     //필드
     private final Socket clientSocket;
@@ -86,8 +88,4 @@ public class ClientHandler implements Runnable {
         this.nickname = nickname;
     }
 
-    @getter
-    public String getNickname(){
-        return nickname;
-    }
 }
