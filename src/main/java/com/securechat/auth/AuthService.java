@@ -20,6 +20,7 @@ public class AuthService {
 
     private static final Gson gson = new Gson();
 
+    //회원가입 로직
     public static void handleSignup(MsgFormat msg) {
         SignupPayload p;
         try {
@@ -103,10 +104,19 @@ public class AuthService {
         LoginPayload p;
         try {
             p = gson.fromJson(msg.getBody(), LoginPayload.class);
-        } catch (JsonSyntaxException e) {
-            System.err.println("[LOGIN] INVALID_JSON from " + msg.getSender());
-            sendErr(msg.getSender(), "INVALID_JSON");
-            return;
+            if (p == null || isBlank(p.id) || isBlank(p.password)) throw new RuntimeException();
+        } catch (Exception ignore) {
+            try {
+                String inner = gson.fromJson(msg.getBody(), String.class); // "..." 형태 대비
+                p = gson.fromJson(inner, LoginPayload.class);
+            } catch (Exception e) {
+                sendErr(msg.getSender(), "INVALID_JSON");
+                return;
+            }
+            if (p == null || isBlank(p.id) || isBlank(p.password)) {
+                sendErr(msg.getSender(), "MISSING_FIELDS");
+                return;
+            }
         }
         if (p == null || isBlank(p.id) || isBlank(p.password)) {
             System.err.println("[LOGIN] MISSING_FIELDS from " + msg.getSender());

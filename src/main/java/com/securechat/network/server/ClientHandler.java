@@ -15,7 +15,7 @@ public class ClientHandler implements Runnable {
     private final PrintWriter out;
     private final Gson gson;
 
-    private String nickname;
+    private volatile String nickname;
 
     //기본 생성자
     public ClientHandler(Socket clientSocket) throws IOException {
@@ -84,5 +84,10 @@ public class ClientHandler implements Runnable {
 
     public void bindNickname(String nickname){
         this.nickname = nickname;
+    }
+
+    @getter
+    public String getNickname(){
+        return nickname;
     }
 }
