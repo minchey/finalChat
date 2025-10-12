@@ -123,9 +123,7 @@ public class AuthService {
             sendErr(msg.getSender(), "MISSING_FIELDS");
             return;
         }
-        handler.bindNickname(p.nickname);   // ➜ 이 소켓의 표시 닉네임 설정
-        ChatServer.bind(p.id, handler);     // ➜ 세션( id → handler ) 등록
-        handler.setAuthenticated(true); //
+
         System.out.println("[LOGIN] request id=" + p.id);
 
         // 아이디가 존재하는지 확인
@@ -150,6 +148,10 @@ public class AuthService {
 
         // ✅ 여기까지 왔다면 로그인 성공!
         sendOk(p.id, "LOGIN_OK");
+
+        handler.bindNickname(p.nickname);   // ➜ 이 소켓의 표시 닉네임 설정
+        ChatServer.bind(p.id, handler);     // ➜ 세션( id → handler ) 등록
+        handler.setAuthenticated(true); //
 
     }
 }
