@@ -125,6 +125,7 @@ public class AuthService {
         }
         handler.bindNickname(p.nickname);   // ➜ 이 소켓의 표시 닉네임 설정
         ChatServer.bind(p.id, handler);     // ➜ 세션( id → handler ) 등록
+        handler.setAuthenticated(true); //
         System.out.println("[LOGIN] request id=" + p.id);
 
         // 아이디가 존재하는지 확인

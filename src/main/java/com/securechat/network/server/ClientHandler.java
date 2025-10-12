@@ -18,6 +18,11 @@ public class ClientHandler implements Runnable {
     private final Gson gson;
 
     private volatile String nickname;
+    private volatile boolean authenticated = false;
+
+    // setter
+    public void setAuthenticated(boolean v) { this.authenticated = v; }
+    public boolean isAuthenticated() { return authenticated; }
 
     //기본 생성자
     public ClientHandler(Socket clientSocket) throws IOException {
@@ -50,7 +55,22 @@ public class ClientHandler implements Runnable {
 
                     }
                     System.out.println("[" + nickname + "][" + msg.getType() + "] " + line);
-                    //ChatServer.broadcast(line);
+
+                    // 인증 전에는 SIGNUP/LOGIN만 허용
+                    if (!isAuthenticated() && msg.getType() != MsgType.SIGNUP && msg.getType() != MsgType.LOGIN) {
+                        // 미인증 클라이언트가 다른 타입 보내면 거절
+                        com.securechat.network.server.ChatServer.sendTo(
+                                msg.getSender(),
+                                new Gson().toJson(new com.securechat.model.MsgFormat(
+                                        MsgType.AUTH_ERR, "server", msg.getSender(), "NOT_AUTHENTICATED",
+                                        java.time.LocalDateTime.now().format(
+                                                java.time.format.DateTimeFormatter.ofPattern(com.securechat.protocol.Protocol.TIMESTAMP_PATTERN)
+                                        )
+                                ))
+                        );
+                        continue; // 이 메시지 무시
+                    }
+
                     MsgDispatcher.dispatch(msg, this); // ✅ 타입별 처리
                 } catch (com.google.gson.JsonSyntaxException je) {
                     System.err.println("[ClientHandler] JSON parse error from " + nickname + ": " + je.getMessage());
