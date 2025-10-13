@@ -9,9 +9,9 @@ public class HistoryService {
     private static final Gson gson = new Gson();
     public static void handle(MsgFormat msg){
         List<MsgFormat> history = ChatServer.getAllHistory();
-        for(MsgFormat m : history){
-            String json = gson.toJson(m);
-            ChatServer.sendTo(msg.getSender(),json);
+        String requesterId = msg.getSender(); // 로그인 시 id 바인딩 가정
+        for (MsgFormat m : history) {
+            ChatServer.sendTo(requesterId, gson.toJson(m));
         }
     }
 }
