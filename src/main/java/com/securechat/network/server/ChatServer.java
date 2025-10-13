@@ -20,8 +20,9 @@ import java.nio.charset.StandardCharsets;
 
 public class ChatServer {
     private static final List<MsgFormat> history = new CopyOnWriteArrayList<>(); //히스토리 저장소
-    private static Map<String,ClientHandler> clients = new ConcurrentHashMap<>(); //자바에서 제공하는 스레드 안전 리스트
-    public static void main(String[] args){
+    private static Map<String, ClientHandler> clients = new ConcurrentHashMap<>(); //자바에서 제공하는 스레드 안전 리스트
+
+    public static void main(String[] args) {
         try {
             //포트 9999에서 서버열기
             ServerSocket serverSocket = new ServerSocket(9999);
@@ -45,36 +46,43 @@ public class ChatServer {
     }
 
     //전체 클라이언트에게 메시지 전송
-    public static void broadcast(String message){
-        for(ClientHandler c : clients.values()){
-            c.sendMessage(message);
+    public static void broadcast(String message) {
+        for (ClientHandler ch : clients.values()) {
+            ch.sendMessage(message);
         }
     }
 
     //접속 종료시 리스트에서 제거
-    public static void remove(String nickname ){
+    public static void remove(String nickname) {
         clients.remove(nickname);
     }
 
-    //히스토리 리스트에 추가
-    public static void appendHistory(MsgFormat msg){
+
+    /**
+     * 히스토리 조작
+     */
+    public static void appendHistory(MsgFormat msg) {
         history.add(msg);
     }
 
+
     //히스토리 리스트 조회
-    public static List<MsgFormat> getAllHistory(){
+    public static List<MsgFormat> getAllHistory() {
         return history;
     }
 
-    //닉넹임 받고 메시지 반환
-    public static void sendTo(String nickname, String message){
-        ClientHandler target = clients.get(nickname);
-        if(target != null) target.sendMessage(message);
-        else System.err.println("클라이언트 없음: " + nickname);
+
+    /**
+     * 특정 id에게 문자열 그대로 전송
+     */
+    public static void sendTo(String id, String message) {
+        ClientHandler target = clients.get(id);
+        if (target != null) target.sendMessage(message);
+        else System.err.println("클라이언트 없음: " + id);
     }
 
-    public static void bind(String id, ClientHandler handler){
-        clients.put(id,handler);
+    public static void bind(String id, ClientHandler handler) {
+        clients.put(id, handler);
     }
 }
 
