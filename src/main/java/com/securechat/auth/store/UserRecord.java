@@ -1,24 +1,26 @@
 package com.securechat.auth.store;
 
-import java.time.LocalDateTime;
+import lombok.*;
 
+@Getter @Setter
+@NoArgsConstructor @AllArgsConstructor @ToString
 public class UserRecord {
-    private final String id;            // 로그인 아이디(고유)
-    private final String passwordHash;  // 해시된 비밀번호
-    private final String nickname;      // 표시용 닉네임
-    private final LocalDateTime createdAt;
+    /** 계정 ID (고유키) */
+    private String id;
+    /** SHA-256 등으로 해시된 비밀번호 */
+    private String passwordHash;
+    /** 표시용 닉네임 (미입력 시 id와 동일하게 저장) */
+    private String nickname;
+    /** ISO-8601 문자열로 저장한 생성시각 */
+    private String createdAt;
 
-    public UserRecord(String id, String passwordHash, String nickname, LocalDateTime createdAt) {
-        this.id = id;
-        this.passwordHash = passwordHash;
-        this.nickname = nickname;
-        this.createdAt = createdAt;
+    public static UserRecord of(String id, String passwordHash, String nickname) {
+        String nick = (nickname == null || nickname.isBlank()) ? id : nickname;
+        return new UserRecord(
+                id,
+                passwordHash,
+                nick,
+                java.time.LocalDateTime.now().toString()
+        );
     }
-
-    public String getId() { return id; }
-    public String getPasswordHash() { return passwordHash; }
-    public String getNickname() { return nickname; }
-    public LocalDateTime getCreatedAt() { return createdAt; }
-
-    // 필요시 equals/hashCode는 id 기준으로만 (선택)
 }
