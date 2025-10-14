@@ -8,8 +8,10 @@ import java.io.*;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter
 public class ClientHandler implements Runnable {
     //필드
     private final Socket clientSocket;
