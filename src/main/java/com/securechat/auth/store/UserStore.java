@@ -1,36 +1,115 @@
+// src/main/java/com/securechat/auth/store/UserStore.java
 package com.securechat.auth.store;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.io.Reader;
+import java.io.Writer;
+import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.*;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+/**
+ * 간단한 파일(JSON) 기반 유저 저장소.
+ * - key: id, value: UserRecord
+ * - putIfAbsent 시 디스크에 즉시 반영(원자적 쓰기)
+ * - 서버 재시작 시 자동 로드
+ */
 public class UserStore {
 
+    private static final Gson GSON = new Gson();
+    private static final Type TYPE = new TypeToken<Map<String, UserRecord>>() {}.getType();
 
-    //  회원 정보를 저장할 "메모리 기반 데이터베이스" 역할
-    //  key   : 회원 아이디 (String)
-    //  value : 해시된 비밀번호 (String)
-    //  ConcurrentHashMap : 여러 스레드(클라이언트)가 동시에 접근해도 안전한 Map
-    private static final ConcurrentHashMap<String,String> users = new ConcurrentHashMap<>();
+    /** 기본 위치: 실행 디렉토리의 users.json (원하면 절대경로로 바꿔도 됨) */
+    private static final Path DB_PATH = Paths.get("users.json");
 
+    private static final ReentrantReadWriteLock RW = new ReentrantReadWriteLock();
+    private static final Map<String, UserRecord> USERS = new ConcurrentHashMap<>();
 
-    //  회원가입할 때 호출되는 메서드
-    // - 아이디가 아직 존재하지 않으면 새 회원을 저장하고 true 반환
-    // - 이미 존재하면 저장하지 않고 false 반환
-    public static boolean putIfAbsent(String id, String hashedPw) {
-        // putIfAbsent() → key가 없을 때만 저장하고, 기존 값이 없으면 null 반환
-        return users.putIfAbsent(id, hashedPw) == null;
+    static {
+        loadFromDisk();
     }
 
+    /* =========================
+     * public API
+     * ========================= */
 
-    //  특정 아이디가 이미 회원 목록에 존재하는지 확인하는 메서드
-    // - 회원가입 시 중복 아이디를 막을 때 사용
+    /** 이미 존재하면 false, 신규 저장되면 true */
+    public static boolean putIfAbsent(String id, String passwordHash) {
+        return putIfAbsent(id, passwordHash, null);
+    }
+
+    /** 닉네임 포함 버전 */
+    public static boolean putIfAbsent(String id, String passwordHash, String nickname) {
+        if (isBlank(id) || isBlank(passwordHash)) return false;
+
+        UserRecord rec = UserRecord.of(id, passwordHash, nickname);
+        UserRecord prev = USERS.putIfAbsent(id, rec);
+        if (prev == null) {
+            persist(); // 신규일 때만 저장
+            return true;
+        }
+        return false;
+    }
+
     public static boolean exists(String id) {
-        return users.containsKey(id);
+        return USERS.containsKey(id);
     }
 
-
-    //  저장된 회원의 해시 비밀번호를 가져오는 메서드
-    // - 로그인 시 입력한 비밀번호를 해시한 값과 비교할 때 사용
-    // - 존재하지 않으면 null 반환
     public static String getHashedPassword(String id) {
-        return users.get(id);
+        UserRecord r = USERS.get(id);
+        return (r == null) ? null : r.getPasswordHash();
+    }
+
+    public static UserRecord findById(String id) {
+        return USERS.get(id);
+    }
+
+    /* =========================
+     * disk I/O
+     * ========================= */
+
+    private static void loadFromDisk() {
+        RW.writeLock().lock();
+        try {
+            if (Files.exists(DB_PATH)) {
+                try (Reader r = Files.newBufferedReader(DB_PATH, StandardCharsets.UTF_8)) {
+                    Map<String, UserRecord> m = GSON.fromJson(r, TYPE);
+                    if (m != null) USERS.putAll(m);
+                } catch (Exception e) {
+                    System.err.println("[UserStore] Load failed: " + e.getMessage());
+                }
+            }
+        } finally {
+            RW.writeLock().unlock();
+        }
+    }
+
+    /** 임시파일→원본 교체로 원자적 쓰기 */
+    private static void persist() {
+        RW.writeLock().lock();
+        try {
+            Path tmp = DB_PATH.resolveSibling(DB_PATH.getFileName() + ".tmp");
+            try (Writer w = Files.newBufferedWriter(
+                    tmp, StandardCharsets.UTF_8,
+                    StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)) {
+                GSON.toJson(USERS, TYPE, w);
+            }
+            Files.move(tmp, DB_PATH,
+                    StandardCopyOption.REPLACE_EXISTING,
+                    StandardCopyOption.ATOMIC_MOVE);
+        } catch (Exception e) {
+            System.err.println("[UserStore] Persist failed: " + e.getMessage());
+        } finally {
+            RW.writeLock().unlock();
+        }
+    }
+
+    private static boolean isBlank(String s) {
+        return s == null || s.trim().isEmpty();
     }
 }
