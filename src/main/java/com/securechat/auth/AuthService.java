@@ -32,7 +32,7 @@ public class AuthService {
     public static void handleSignup(MsgFormat msg) {
         SignupPayload p;
         try {
-            // body 예: {"id": "minchey", "password": "1234", "nickname":"민체이"}
+            // body 예: {"id": "minchey", "password": "1234", "nickname":"민제"}
             p = gson.fromJson(msg.getBody(), SignupPayload.class);
         } catch (JsonSyntaxException e) {
             sendErr(msg.getSender(), "INVALID_JSON");
@@ -49,7 +49,7 @@ public class AuthService {
         String hashPw = Hashing.sha256().hashString(p.password, StandardCharsets.UTF_8).toString();
 
         // 중복 아이디 체크 후 저장
-        boolean created = UserStore.putIfAbsent(p.id, hashPw);
+        boolean created = UserStore.putIfAbsent(p.id, hashPw, p.nickname);
         if (!created) { // 이미 존재
             sendErr(p.id, "DUPLICATE_ID");
             return;
