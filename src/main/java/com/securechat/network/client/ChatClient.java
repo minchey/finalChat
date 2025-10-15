@@ -15,12 +15,42 @@ import java.util.Map;
 import java.util.Scanner;
 import java.time.format.DateTimeFormatter;
 public class ChatClient {
+    private volatile boolean authenticated = false;
+
+    // 메뉴 루프에서 reader 생성 시 this 전달
+    private void startReader(Socket socket) throws IOException {
+        Thread t = new Thread(new ServerMessageReader(socket, this));
+        t.setDaemon(true);
+        t.start();
+    }
+
+    public boolean isAuthenticated() { return authenticated; }
+
+    // ✅ 회원가입 성공 → 메뉴로 복귀(인증 false 유지)
+    public void onSignupOk() {
+        this.authenticated = false;
+        // 여기서 아무 것도 안 하고 메뉴 루프가 계속 돌도록 설계
+    }
+
+    // ✅ 로그인 성공 → 인증 true로 전환하고 게이트/플래그 해제
+    public void onAuthOkLogin() {
+        this.authenticated = true;
+        // 히스토리 요청 등 후속 처리하고 채팅 모드 진입
+    }
+
+    // ❌ 인증 실패 → 인증 false 유지, 메뉴로 복귀
+    public void onAuthErr(String reason) {
+        this.authenticated = false;
+        // 실패 안내 출력은 reader에서 이미 했으므로 여기선 상태만 유지
+    }
+
     public static void main(String[] args) {
         Gson gson = new Gson();           //gson 객체 생성
         Scanner sc = new Scanner(System.in);
         String msg;
         String nicknameForAuth ="";
         String userId = null;
+        ChatClient client = new ChatClient();
         int signupOrLogin;
         try{
             //서버에 연결
@@ -78,7 +108,7 @@ public class ChatClient {
 
             System.out.println("서버에 연결됨: " + socket + " as " + (userId != null ? userId : ""));
             //스레드 시작
-            Thread t = new Thread(new ServerMessageReader(socket));
+            Thread t = new Thread(new ServerMessageReader(socket, client));
             t.start();
 
             while (true){

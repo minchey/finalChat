@@ -7,58 +7,86 @@ import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 
 import com.securechat.model.MsgFormat;
+import com.securechat.protocol.MsgType;
 import com.google.gson.Gson;
 
-public class ServerMessageReader implements Runnable { //서버에서 수신한 메시지 띄우는 클래스
-    private Socket socket;
-    private BufferedReader in;
-    private Gson gson = new Gson();
+/**
+ * 서버에서 오는 라인을 계속 읽어서
+ * - AUTH_OK(SIGNUP_OK/LOGIN_OK) 시 ChatClient 콜백 호출
+ * - AUTH_ERR 시 실패 콜백
+ * - 인증 전에는 CHAT/HISTORY 등의 일반 메시지를 무시
+ */
+public class ServerMessageReader implements Runnable {
+    private final Socket socket;
+    private final BufferedReader in;
+    private final Gson gson = new Gson();
+    private final ChatClient client;         // ✅ 콜백 대상
 
-    //생성자
-    public ServerMessageReader(Socket socket) throws IOException {
+    // ✅ ChatClient를 같이 받도록 변경
+    public ServerMessageReader(Socket socket, ChatClient client) throws IOException {
         this.socket = socket;
-        this.in = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8)); //UTF-8로 인코딩
+        this.client = client;
+        this.in = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
     }
 
     @Override
-    public void run() { //수신 스레드
-
+    public void run() {
         try {
-            while (true) {
-                String line = in.readLine();
-                if (line == null) break;
-                // ✅ JSON → 객체 변환
+            String line;
+            while ((line = in.readLine()) != null) {
                 MsgFormat msg = gson.fromJson(line, MsgFormat.class);
-
-                // ✅ 타입별 처리
-                switch (msg.getType()) {
-                    case AUTH_OK:
-                        System.out.println("✅ 로그인 성공!");
-                        break;
-                    case AUTH_ERR:
-                        System.out.println("❌ 로그인 실패: " + msg.getBody());
-                        break;
-                    case CHAT:
-                        System.out.println("💬 " + msg.getSender() + ": " + msg.getBody());
-                        break;
-                    case SYSTEM:
-                        System.out.println("📢 시스템 메시지: " + msg.getBody());
-                        break;
-                    default:
-                        System.out.println("[서버 응답] " + msg.getType() + ": " + msg.getBody());
+                if (msg == null || msg.getType() == null) {
+                    System.err.println("[Reader] invalid JSON: " + line);
+                    continue;
                 }
-                System.out.println(line);
+
+                switch (msg.getType()) {
+                    case AUTH_OK -> {
+                        // body: "SIGNUP_OK" 또는 "LOGIN_OK"
+                        String body = msg.getBody();
+                        if ("LOGIN_OK".equals(body)) {
+                            System.out.println("✅ 로그인 성공!");
+                            client.onAuthOkLogin();          // 🔑 인증 완료(채팅 모드 진입 준비)
+                        } else if ("SIGNUP_OK".equals(body)) {
+                            System.out.println("✅ 회원가입 완료! 메뉴로 돌아갑니다.");
+                            client.onSignupOk();             // 🔁 메뉴 복귀(인증은 false 유지)
+                        } else {
+                            System.out.println("[AUTH_OK] " + body);
+                        }
+                    }
+                    case AUTH_ERR -> {
+                        System.out.println("❌ 인증 실패: " + msg.getBody());
+                        client.onAuthErr(msg.getBody());     // 🔒 인증 실패(메뉴 대기)
+                    }
+                    case SYSTEM -> {
+                        System.out.println("📢 시스템: " + msg.getBody());
+                    }
+                    default -> {
+                        // 인증 전에는 일반 메시지 무시 (로그만)
+                        if (!client.isAuthenticated()) {
+                            if (msg.getType() != MsgType.AUTH_OK && msg.getType() != MsgType.AUTH_ERR) {
+                                // 디버깅용 로그만 남기고 스킵
+                                // System.out.println("[IGNORED pre-auth] " + msg.getType() + ": " + msg.getBody());
+                            }
+                            break;
+                        }
+                        // 인증 후에만 화면에 출력
+                        if (msg.getType() == MsgType.CHAT) {
+                            System.out.println("💬 " + msg.getSender() + ": " + msg.getBody());
+                        } else {
+                            System.out.println("[" + msg.getType() + "] " + msg.getBody());
+                        }
+                    }
+                }
+                // 원본 라인(debug)이 필요하면 아래 주석 해제
+                // System.out.println(line);
             }
         } catch (IOException e) {
-            e.printStackTrace();
-        } finally { //종료
-            try {
-                if (in != null) in.close();
-                if (socket != null && !socket.isClosed()) socket.close();
-            } catch (IOException e) {
-                System.out.println("서버와의 연결이 끊어졌습니다.");
-            }
+            System.err.println("[Reader] IO error: " + e.getMessage());
+        } finally {
+            try { in.close(); } catch (Exception ignore) {}
+            try { if (socket != null && !socket.isClosed()) socket.close(); } catch (Exception ignore) {}
+            System.out.println("서버와의 연결이 종료되었습니다.");
         }
     }
 }
-
