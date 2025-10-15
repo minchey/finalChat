@@ -16,17 +16,24 @@ public class UserRecord {
 
     private String identityPublicKey; // 🔥 Base64
 
+    //기본 생성자
+    public UserRecord(){}
     public String getIdentityPublicKey() { return identityPublicKey; }
 
     public void setIdentityPublicKey(String v) { this.identityPublicKey = v; }
 
+    public static UserRecord of(String id, String passwordHash, String nickname, String identityPublicKey) {
+        UserRecord r = new UserRecord();
+        r.id = id;
+        r.passwordHash = passwordHash;
+        r.nickname = (nickname == null || nickname.isBlank()) ? id : nickname;
+        r.identityPublicKey = identityPublicKey;
+        r.createdAt = java.time.LocalDateTime.now().toString();
+        return r;
+    }
+
+    // (기존에 쓰던 오버로드를 위해) 닉네임만 있는 버전
     public static UserRecord of(String id, String passwordHash, String nickname) {
-        String nick = (nickname == null || nickname.isBlank()) ? id : nickname;
-        return new UserRecord(
-                id,
-                passwordHash,
-                nick,
-                java.time.LocalDateTime.now().toString()
-        );
+        return of(id, passwordHash, nickname, null);
     }
 }
