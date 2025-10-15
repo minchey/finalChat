@@ -16,9 +16,6 @@ public class UserRecord {
 
     private String identityPublicKey; // 🔥 Base64
 
-    //기본 생성자
-    public UserRecord(){}
-
     // --- getters/setters ---
     public String getId() { return id; }
     public String getPasswordHash() { return passwordHash; }
@@ -26,8 +23,8 @@ public class UserRecord {
     public String getCreatedAt() { return createdAt; }
     public String getIdentityPublicKey() { return identityPublicKey; }
 
-    public void setIdentityPublicKey(String identityPublicKey) { this.identityPublicKey = identityPublicKey; }
-    public void setNickname(String nickname) { this.nickname = nickname; }
+    //public void setIdentityPublicKey(String identityPublicKey) { this.identityPublicKey = identityPublicKey; }
+    //public void setNickname(String nickname) { this.nickname = nickname; }
 
     public static UserRecord of(String id, String passwordHash, String nickname, String identityPublicKey) {
         UserRecord r = new UserRecord();
