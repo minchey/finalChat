@@ -39,12 +39,16 @@ public class UserStore {
      * ========================= */
 
     /** 이미 존재하면 false, 신규 저장되면 true */
-    public static boolean putIfAbsent(String id, String passwordHash) {
-        return putIfAbsent(id, passwordHash, null);
-    }
+    public static boolean putIfAbsent(String id, String passwordHash, String identityPublicKey) {
+        if (isBlank(id) || isBlank(passwordHash) || isBlank(identityPublicKey)) return false;
+        UserRecord rec = UserRecord.of(id, passwordHash, nickname);
+        rec.setIdentityPublicKey(identityPublicKey); // 🔥 추가 필드
+        UserRecord prev = USERS.putIfAbsent(id, rec);
+        if (prev == null) { persist(); return true; }
+        return false;    }
 
     /** 닉네임 포함 버전 */
-    public static boolean putIfAbsent(String id, String passwordHash, String nickname) {
+    public static boolean putIfAbsent(String id, String passwordHash, String nickname, String identityPublicKey) {
         if (isBlank(id) || isBlank(passwordHash)) return false;
 
         UserRecord rec = UserRecord.of(id, passwordHash, nickname);

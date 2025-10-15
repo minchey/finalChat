@@ -14,6 +14,12 @@ public class UserRecord {
     /** ISO-8601 문자열로 저장한 생성시각 */
     private String createdAt;
 
+    private String identityPublicKey; // 🔥 Base64
+
+    public String getIdentityPublicKey() { return identityPublicKey; }
+
+    public void setIdentityPublicKey(String v) { this.identityPublicKey = v; }
+
     public static UserRecord of(String id, String passwordHash, String nickname) {
         String nick = (nickname == null || nickname.isBlank()) ? id : nickname;
         return new UserRecord(
