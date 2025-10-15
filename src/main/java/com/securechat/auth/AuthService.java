@@ -40,7 +40,7 @@ public class AuthService {
         }
 
         // 필수 필드 검증
-        if (p == null || isBlank(p.id) || isBlank(p.password) || isBlank(p.nickname)) {
+        if (p == null || isBlank(p.id) || isBlank(p.password) || isBlank(p.nickname) || isBlank(p.identityPublicKey)) {
             sendErr(msg.getSender(), "MISSING_FIELDS");
             return;
         }
@@ -170,6 +170,7 @@ public class AuthService {
         public String id;
         public String password;
         public String nickname;
+        public String identityPublicKey;
     }
 
     // 로그인 DTO (nickname은 표시용, 서버 저장소에 닉네임이 따로 있다면 거기 것을 우선 사용 권장)
