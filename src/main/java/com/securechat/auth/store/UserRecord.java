@@ -18,9 +18,16 @@ public class UserRecord {
 
     //기본 생성자
     public UserRecord(){}
+
+    // --- getters/setters ---
+    public String getId() { return id; }
+    public String getPasswordHash() { return passwordHash; }
+    public String getNickname() { return nickname; }
+    public String getCreatedAt() { return createdAt; }
     public String getIdentityPublicKey() { return identityPublicKey; }
 
-    public void setIdentityPublicKey(String v) { this.identityPublicKey = v; }
+    public void setIdentityPublicKey(String identityPublicKey) { this.identityPublicKey = identityPublicKey; }
+    public void setNickname(String nickname) { this.nickname = nickname; }
 
     public static UserRecord of(String id, String passwordHash, String nickname, String identityPublicKey) {
         UserRecord r = new UserRecord();
@@ -36,4 +43,6 @@ public class UserRecord {
     public static UserRecord of(String id, String passwordHash, String nickname) {
         return of(id, passwordHash, nickname, null);
     }
+
+
 }
