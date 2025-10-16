@@ -79,13 +79,14 @@ public class ChatClient {
                         LocalDateTime.now().format(DateTimeFormatter.ofPattern(Protocol.TIMESTAMP_PATTERN)));
                 out.println(gson.toJson(signUp));
                 userId = id;
+                signupOrLogin = 0;  //메뉴로 복귀
             }
 
             //로그인 분기
             if(signupOrLogin == 2){
-                System.out.println("아이디를 입력하세요: ");
+                System.out.println("로그인 - 아이디를 입력하세요: ");
                 String id = sc.nextLine().trim();
-                System.out.println("비밀번호를 입력하세요");
+                System.out.println("로그인 - 비밀번호를 입력하세요");
                 String pw = sc.nextLine();
 
                 String body = gson.toJson(java.util.Map.of(
