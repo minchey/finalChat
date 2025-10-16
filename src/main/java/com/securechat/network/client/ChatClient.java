@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Scanner;
 import java.time.format.DateTimeFormatter;
+
 public class ChatClient {
     private volatile boolean authenticated = false;
 
@@ -24,7 +25,9 @@ public class ChatClient {
         t.start();
     }
 
-    public boolean isAuthenticated() { return authenticated; }
+    public boolean isAuthenticated() {
+        return authenticated;
+    }
 
     // ✅ 회원가입 성공 → 메뉴로 복귀(인증 false 유지)
     public void onSignupOk() {
@@ -48,22 +51,37 @@ public class ChatClient {
         Gson gson = new Gson();           //gson 객체 생성
         Scanner sc = new Scanner(System.in);
         String msg;
-        String nicknameForAuth ="";
+        String nicknameForAuth = "";
         String userId = null;
         ChatClient client = new ChatClient();
-        int signupOrLogin;
-        try{
+        int signupOrLogin = 0;
+        try {
             //서버에 연결
-            Socket socket = new Socket("localhost",9999);
+            Socket socket = new Socket("localhost", 9999);
             PrintWriter out = new PrintWriter( //UTF-8 인코딩
                     new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8), true);
 
-            System.out.println("1.회원가입 2.로그인");
-            signupOrLogin = sc.nextInt();
-            sc.nextLine(); // 엔터 제거
+            // 루프 맨 위 (메뉴 표시/선택)
+            if (signupOrLogin == 0) {
+                System.out.println("1.회원가입  2.로그인");
+                String line = sc.nextLine().trim();
+
+                int choice;
+                try {
+                    choice = Integer.parseInt(line);
+                } catch (NumberFormatException e) {
+                    choice = 0; // 숫자 아니면 다시 메뉴
+                }
+
+                switch (choice) {
+                    case 1 -> signupOrLogin = 1;
+                    case 2 -> signupOrLogin = 2;
+                    default -> signupOrLogin = 0; // 잘못 입력 시 메뉴 유지
+                }
+            }
 
             //회원가입 분기
-            if(signupOrLogin == 1){
+            if (signupOrLogin == 1) {
                 System.out.println("아이디를 입력하세요 : ");
                 String id = sc.nextLine().trim();
                 System.out.println("비밀번호를 입력하세요 : ");
@@ -83,7 +101,7 @@ public class ChatClient {
             }
 
             //로그인 분기
-            if(signupOrLogin == 2){
+            if (signupOrLogin == 2) {
                 System.out.println("로그인 - 아이디를 입력하세요: ");
                 String id = sc.nextLine().trim();
                 System.out.println("로그인 - 비밀번호를 입력하세요");
@@ -112,15 +130,15 @@ public class ChatClient {
             Thread t = new Thread(new ServerMessageReader(socket, client));
             t.start();
 
-            while (true){
+            while (true) {
                 msg = sc.nextLine(); //메시지 한줄 입력
-                if(msg.isBlank() || msg.isEmpty()) continue;
+                if (msg.isBlank() || msg.isEmpty()) continue;
                 //timestamp
                 String ts = LocalDateTime.now()
                         .format(DateTimeFormatter.ofPattern(Protocol.TIMESTAMP_PATTERN));
 
                 // DTO 만들기 (type이 String이라면 name() 사용)
-                MsgFormat message = new MsgFormat(MsgType.CHAT, userId, "all", msg,ts);
+                MsgFormat message = new MsgFormat(MsgType.CHAT, userId, "all", msg, ts);
 
                 // JSON 직렬화 및 전송
                 String json = gson.toJson(message);
