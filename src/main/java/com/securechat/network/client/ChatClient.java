@@ -134,6 +134,18 @@ public class ChatClient {
             Thread t = new Thread(new ServerMessageReader(socket, client));
             t.start();
 
+            /*로그인 확인 대기*/
+            System.out.println("로그인 확인 중. . . (최대 5초)");
+            long deadline = System.currentTimeMillis() + 5000;
+            while (!client.isAuthenticated() && System.currentTimeMillis() < deadline) {
+                try { Thread.sleep(100); } catch (InterruptedException ignore) {}
+            }
+            if (!client.isAuthenticated()) {
+                System.out.println("❌ 로그인 실패 또는 타임아웃. 프로그램을 종료합니다.");
+                try { socket.close(); } catch (Exception ignore) {}
+                return;
+            }
+
             while (true) {
                 msg = sc.nextLine(); //메시지 한줄 입력
                 if (msg.isBlank() || msg.isEmpty()) continue;
