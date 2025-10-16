@@ -61,70 +61,74 @@ public class ChatClient {
             PrintWriter out = new PrintWriter( //UTF-8 인코딩
                     new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8), true);
 
-            // 루프 맨 위 (메뉴 표시/선택)
-            if (signupOrLogin == 0) {
-                System.out.println("1.회원가입  2.로그인");
-                String line = sc.nextLine().trim();
+            while (true) {
+                // (메뉴 표시/선택)
+                if (signupOrLogin == 0) {
+                    System.out.println("1.회원가입  2.로그인");
+                    String line = sc.nextLine().trim();
 
-                int choice;
-                try {
-                    choice = Integer.parseInt(line);
-                } catch (NumberFormatException e) {
-                    choice = 0; // 숫자 아니면 다시 메뉴
+                    int choice;
+                    try {
+                        choice = Integer.parseInt(line);
+                    } catch (NumberFormatException e) {
+                        choice = 0; // 숫자 아니면 다시 메뉴
+                    }
+
+                    switch (choice) {
+                        case 1 -> signupOrLogin = 1;
+                        case 2 -> signupOrLogin = 2;
+                        default -> signupOrLogin = 0; // 잘못 입력 시 메뉴 유지
+                    }
+                    continue;
                 }
 
-                switch (choice) {
-                    case 1 -> signupOrLogin = 1;
-                    case 2 -> signupOrLogin = 2;
-                    default -> signupOrLogin = 0; // 잘못 입력 시 메뉴 유지
+                //회원가입 분기
+                if (signupOrLogin == 1) {
+                    System.out.println("아이디를 입력하세요 : ");
+                    String id = sc.nextLine().trim();
+                    System.out.println("비밀번호를 입력하세요 : ");
+                    String pw = sc.nextLine();
+                    System.out.println("닉네임을 입력하세요 : ");
+                    nicknameForAuth = sc.nextLine().trim();
+                    String body = gson.toJson(Map.of("id", id, "password", pw, "nickname", nicknameForAuth)); //id + pw 해시저장 + 닉네임
+                    MsgFormat signUp = new MsgFormat(
+                            MsgType.SIGNUP,
+                            id,
+                            "server",
+                            body,
+                            LocalDateTime.now().format(DateTimeFormatter.ofPattern(Protocol.TIMESTAMP_PATTERN)));
+                    out.println(gson.toJson(signUp));
+                    userId = id;
+                    signupOrLogin = 0;  //메뉴로 복귀
+                    continue;
+                }
+
+                //로그인 분기
+                if (signupOrLogin == 2) {
+                    System.out.println("로그인 - 아이디를 입력하세요: ");
+                    String id = sc.nextLine().trim();
+                    System.out.println("로그인 - 비밀번호를 입력하세요");
+                    String pw = sc.nextLine();
+
+                    String body = gson.toJson(java.util.Map.of(
+                            "id", id,
+                            "password", pw
+                    ));
+
+                    MsgFormat login = new MsgFormat(
+                            MsgType.LOGIN,
+                            id,
+                            "server",
+                            body,
+                            java.time.LocalDateTime.now().format(
+                                    java.time.format.DateTimeFormatter.ofPattern(Protocol.TIMESTAMP_PATTERN)
+                            )
+                    );
+                    out.println(gson.toJson(login));
+                    userId = id;
+                    break;
                 }
             }
-
-            //회원가입 분기
-            if (signupOrLogin == 1) {
-                System.out.println("아이디를 입력하세요 : ");
-                String id = sc.nextLine().trim();
-                System.out.println("비밀번호를 입력하세요 : ");
-                String pw = sc.nextLine();
-                System.out.println("닉네임을 입력하세요 : ");
-                nicknameForAuth = sc.nextLine().trim();
-                String body = gson.toJson(Map.of("id", id, "password", pw, "nickname", nicknameForAuth)); //id + pw 해시저장 + 닉네임
-                MsgFormat signUp = new MsgFormat(
-                        MsgType.SIGNUP,
-                        id,
-                        "server",
-                        body,
-                        LocalDateTime.now().format(DateTimeFormatter.ofPattern(Protocol.TIMESTAMP_PATTERN)));
-                out.println(gson.toJson(signUp));
-                userId = id;
-                signupOrLogin = 0;  //메뉴로 복귀
-            }
-
-            //로그인 분기
-            if (signupOrLogin == 2) {
-                System.out.println("로그인 - 아이디를 입력하세요: ");
-                String id = sc.nextLine().trim();
-                System.out.println("로그인 - 비밀번호를 입력하세요");
-                String pw = sc.nextLine();
-
-                String body = gson.toJson(java.util.Map.of(
-                        "id", id,
-                        "password", pw
-                ));
-
-                MsgFormat login = new MsgFormat(
-                        MsgType.LOGIN,
-                        id,
-                        "server",
-                        body,
-                        java.time.LocalDateTime.now().format(
-                                java.time.format.DateTimeFormatter.ofPattern(Protocol.TIMESTAMP_PATTERN)
-                        )
-                );
-                out.println(gson.toJson(login));
-                userId = id;
-            }
-
             System.out.println("서버에 연결됨: " + socket + " as " + (userId != null ? userId : ""));
             //스레드 시작
             Thread t = new Thread(new ServerMessageReader(socket, client));
