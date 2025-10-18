@@ -136,11 +136,11 @@ public class ChatClient {
 
             /*로그인 확인 대기*/
             System.out.println("로그인 확인 중. . . (최대 5초)");
-            long deadline = System.currentTimeMillis() + 5000;
-            while (!client.isAuthenticated() && System.currentTimeMillis() < deadline) {
+            long deadline = System.currentTimeMillis() + 5000;  //5초 뒤
+            while (!client.isAuthenticated() && System.currentTimeMillis() < deadline) { //인증 될 동안 반복
                 try { Thread.sleep(100); } catch (InterruptedException ignore) {}
             }
-            if (!client.isAuthenticated()) {
+            if (!client.isAuthenticated()) { // 인증 되지 않았을 경우
                 System.out.println("❌ 로그인 실패 또는 타임아웃. 프로그램을 종료합니다.");
                 try { socket.close(); } catch (Exception ignore) {}
                 return;
