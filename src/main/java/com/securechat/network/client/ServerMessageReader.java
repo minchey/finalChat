@@ -35,6 +35,14 @@ public class ServerMessageReader implements Runnable {
             String line;
             while ((line = in.readLine()) != null) {
                 MsgFormat msg = gson.fromJson(line, MsgFormat.class);
+                // 인증 전에는 일반 메시지 무시 (로그만)
+                if (!client.isAuthenticated()) {
+                    if (msg.getType() != MsgType.AUTH_OK && msg.getType() != MsgType.AUTH_ERR) {
+                        // 디버깅용 로그만 남기고 스킵
+                        // System.out.println("[IGNORED pre-auth] " + msg.getType() + ": " + msg.getBody());
+                    }
+                    break;
+                }
                 if (msg == null || msg.getType() == null) {
                     System.err.println("[Reader] invalid JSON: " + line);
                     continue;
@@ -62,14 +70,7 @@ public class ServerMessageReader implements Runnable {
                         System.out.println("📢 시스템: " + msg.getBody());
                     }
                     default -> {
-                        // 인증 전에는 일반 메시지 무시 (로그만)
-                        if (!client.isAuthenticated()) {
-                            if (msg.getType() != MsgType.AUTH_OK && msg.getType() != MsgType.AUTH_ERR) {
-                                // 디버깅용 로그만 남기고 스킵
-                                // System.out.println("[IGNORED pre-auth] " + msg.getType() + ": " + msg.getBody());
-                            }
-                            break;
-                        }
+
                         // 인증 후에만 화면에 출력
                         if (msg.getType() == MsgType.CHAT) {
                             System.out.println("💬 " + msg.getSender() + ": " + msg.getBody());
