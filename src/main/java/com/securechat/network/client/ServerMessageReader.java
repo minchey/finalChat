@@ -40,6 +40,7 @@ public class ServerMessageReader implements Runnable {
                     if (msg.getType() != MsgType.AUTH_OK && msg.getType() != MsgType.AUTH_ERR) {
                         // 디버깅용 로그만 남기고 스킵
                         // System.out.println("[IGNORED pre-auth] " + msg.getType() + ": " + msg.getBody());
+                        continue;
                     }
                     break;
                 }
