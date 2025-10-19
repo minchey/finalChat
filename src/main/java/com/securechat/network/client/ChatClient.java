@@ -61,6 +61,8 @@ public class ChatClient {
             PrintWriter out = new PrintWriter( //UTF-8 인코딩
                     new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8), true);
 
+            client.startReader(socket); //리더 스레드 시작
+
             while (true) {
                 // (메뉴 표시/선택)
                 if (signupOrLogin == 0) {
@@ -131,8 +133,8 @@ public class ChatClient {
             }
             System.out.println("서버에 연결됨: " + socket + " as " + (userId != null ? userId : ""));
             //스레드 시작
-            Thread t = new Thread(new ServerMessageReader(socket, client));
-            t.start();
+//            Thread t = new Thread(new ServerMessageReader(socket, client));
+//            t.start();
 
             /*로그인 확인 대기*/
             System.out.println("로그인 확인 중. . . (최대 5초)");
