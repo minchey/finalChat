@@ -51,10 +51,6 @@ public class ServerMessageReader implements Runnable {
                     }
 
                 }
-                if (msg == null || msg.getType() == null) {   //null 체크
-                    System.err.println("[Reader] invalid JSON: " + line);
-                    continue;
-                }
 
                 switch (msg.getType()) {
                     case AUTH_OK -> {
