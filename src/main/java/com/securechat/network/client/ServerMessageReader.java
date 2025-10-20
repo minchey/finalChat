@@ -35,6 +35,13 @@ public class ServerMessageReader implements Runnable {
             String line;
             while ((line = in.readLine()) != null) {
                 MsgFormat msg = gson.fromJson(line, MsgFormat.class);
+
+                // ✅ 1) null/타입 먼저 검증 (NPE 방지)
+                if (msg == null || msg.getType() == null) {
+                    System.err.println("[Reader] invalid JSON: " + line);
+                    continue;
+                }
+
                 // 인증 전에는 일반 메시지 무시 (로그만)
                 if (!client.isAuthenticated()) {
                     if (msg.getType() != MsgType.AUTH_OK && msg.getType() != MsgType.AUTH_ERR) {
@@ -42,7 +49,7 @@ public class ServerMessageReader implements Runnable {
                         // System.out.println("[IGNORED pre-auth] " + msg.getType() + ": " + msg.getBody());
                         continue;
                     }
-                    break;
+
                 }
                 if (msg == null || msg.getType() == null) {   //null 체크
                     System.err.println("[Reader] invalid JSON: " + line);
