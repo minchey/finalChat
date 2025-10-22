@@ -119,8 +119,6 @@ public class AuthService {
 
         sendOk(p.id, "LOGIN_OK");
 
-        // (선택) 로그인 직후 히스토리 자동 전송을 서버에서 트리거하려면:
-        // HistoryService.handle(new MsgFormat(MsgType.HISTORY, p.id, p.id, "", nowTs()));
     }
 
     /* ===========================
