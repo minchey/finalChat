@@ -99,7 +99,10 @@ public class AuthService {
         // 2) 계정 존재 여부
         if (!UserStore.exists(p.id)) {
             handler.setAuthenticated(false);          // ❌ 반드시 false 강제
-            sendErr(p.id, "USER_NOT_FOUND");
+            //sendErr(p.id, "USER_NOT_FOUND");
+            handler.sendMessage(new Gson().toJson(
+                    new MsgFormat(MsgType.AUTH_ERR, "server", p.id, "USER_NOT_FOUND", nowTs())
+            ));
             return;
         }
 
@@ -112,7 +115,10 @@ public class AuthService {
         byte[] b = inputHash.getBytes(StandardCharsets.UTF_8);
         if (!java.security.MessageDigest.isEqual(a, b)) {
             handler.setAuthenticated(false);          // ❌ 반드시 false 강제
-            sendErr(p.id, "WRONG_PASSWORD");
+            //sendErr(p.id, "WRONG_PASSWORD");
+            handler.sendMessage(new Gson().toJson(
+                    new MsgFormat(MsgType.AUTH_ERR, "server", p.id, "WRONG_PASSWORD", nowTs())
+            ));
             return;
         }
 
