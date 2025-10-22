@@ -78,12 +78,18 @@ public class AuthService {
             } catch (Exception e) {
                 // ❌ 파싱 실패: 인증 금지 + 에러 응답
                 handler.setAuthenticated(false);
-                sendErr(msg.getSender(), "INVALID_JSON");
+                //sendErr(msg.getSender(), "INVALID_JSON");
+                handler.sendMessage(new Gson().toJson(
+                        new MsgFormat(MsgType.AUTH_ERR, "server", msg.getSender(), "INVALID_JSON", nowTs())
+                ));
                 return;
             }
             if (p == null || isBlank(p.id) || isBlank(p.password)) {
                 handler.setAuthenticated(false);
-                sendErr(msg.getSender(), "MISSING_FIELDS");
+                //sendErr(msg.getSender(), "MISSING_FIELDS");
+                handler.sendMessage(new Gson().toJson(
+                        new MsgFormat(MsgType.AUTH_ERR, "server", msg.getSender(), "MISSING_FIELDS", nowTs())
+                ));
                 return;
             }
         }
