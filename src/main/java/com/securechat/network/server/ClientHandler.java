@@ -31,11 +31,12 @@ public class ClientHandler implements Runnable {
     private final PrintWriter out;
     private final Gson gson = new Gson();
 
+
     /* ------------------------------
      *  세션 상태 (인증/사용자 식별)
      * ------------------------------ */
     /** 로그인에 성공한 사용자 ID (id 기반 라우팅에 사용) */
-    private volatile String userId = null;
+    private volatile String userId;
 
     /** 화면에 표기할 닉네임(옵션) */
     private volatile String nickname = null;
@@ -109,30 +110,23 @@ public class ClientHandler implements Runnable {
             // 소켓/리소스 정리 + 서버 알림
             try {
                 closeConnection();
-
-                // ⚠️ 현재 프로젝트가 nickname 키로 관리 중이면 기존 remove 유지.
-                // ➜ 권장: ChatServer.unbind(userId) 로 전환해 id 기반 세션 관리 통일.
-                try {
-                    if (userId != null) {
-                        // ChatServer.unbind(userId); // 권장(서버에 구현 필요)
-                    } else if (nickname != null) {
-                        ChatServer.remove(nickname); // 기존 코드 호환
-                    }
-                } catch (Throwable t) {
-                    // 위 두 API 중 하나만 존재할 수 있으므로 안전하게 무시
+                // ✅ 인증된 세션만 id로 정리
+                if (authenticated && userId != null && !userId.isBlank()) {
+                    ChatServer.remove(userId); // 또는 ChatServer.unbind(userId);
                 }
 
-                // 종료 브로드캐스트 (닉네임/ID 표기)
-                String who = (nickname != null) ? nickname
-                        : (userId != null ? userId : "알 수 없음");
-                MsgFormat sys = new MsgFormat(
-                        MsgType.SYSTEM,
-                        "system",
-                        "all",
-                        who + "님이 종료하였습니다.",
-                        nowTs()
-                );
-                ChatServer.broadcast(gson.toJson(sys));
+                // ✅ 미인증 종료는 방송 생략, 인증된 경우만 방송
+                if (authenticated) {
+                    String who = (nickname != null) ? nickname : userId;
+                    MsgFormat sys = new MsgFormat(
+                            MsgType.SYSTEM,
+                            "system",
+                            "all",
+                            who + "님이 종료하였습니다.",
+                            nowTs()
+                    );
+                    ChatServer.broadcast(gson.toJson(sys));
+                }
 
             } catch (IOException e) {
                 System.err.println("[ClientHandler] close error for " + clientSocket + ": " + e.getMessage());

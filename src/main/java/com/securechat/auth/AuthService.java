@@ -113,9 +113,9 @@ public class AuthService {
         // 4) ✅ 여기서부터 "성공" 처리만 수행
         //    - 바인딩/인증은 이 시점에만!
         handler.bindNickname(p.nickname);             // 표시용 닉네임(옵션 필드)
-        handler.setUserId(p.id);                      // 세션에 사용자 id 기록
         ChatServer.bind(p.id, handler);               // (id → handler) 매핑
         handler.setAuthenticated(true);               // ✅ 인증 완료
+        handler.setUserId(p.id);                      // 세션에 사용자 id 기록
 
         sendOk(p.id, "LOGIN_OK");
 
