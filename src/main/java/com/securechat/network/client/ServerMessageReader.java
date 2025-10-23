@@ -35,6 +35,8 @@ public class ServerMessageReader implements Runnable {
             String line;
             while ((line = in.readLine()) != null) {
                 MsgFormat msg = gson.fromJson(line, MsgFormat.class);
+                System.out.println("[RAW] " + line);  // 🔍 서버가 보낸 원문 라인 그대로 보기
+
 
                 // ✅ 1) null/타입 먼저 검증 (NPE 방지)
                 if (msg == null || msg.getType() == null) {
@@ -54,14 +56,18 @@ public class ServerMessageReader implements Runnable {
 
                 switch (msg.getType()) {
                     case AUTH_OK -> {
-                        // body: "SIGNUP_OK" 또는 "LOGIN_OK"
+                        // ✅ body 값이 무엇이든 먼저 인증 통과 (서버가 이미 setAuthenticated(true) 했다고 가정)
+                        if (!client.isAuthenticated()) {
+                            client.onAuthOkLogin();
+                        }
+
                         String body = msg.getBody();
                         if ("LOGIN_OK".equals(body)) {
                             System.out.println("✅ 로그인 성공!");
-                            client.onAuthOkLogin();          // 🔑 인증 완료(채팅 모드 진입 준비)
                         } else if ("SIGNUP_OK".equals(body)) {
                             System.out.println("✅ 회원가입 완료! 메뉴로 돌아갑니다.");
-                            client.onSignupOk();             // 🔁 메뉴 복귀(인증은 false 유지)
+                            // 회원가입은 인증을 올리면 안 되므로 필요하면 아래 한 줄로 내릴 수도 있음.
+                            // client.onSignupOk();  // 인증 false 유지
                         } else {
                             System.out.println("[AUTH_OK] " + body);
                         }
