@@ -40,9 +40,9 @@ public class AuthService {
         }
 
         // 필수 필드 검증
-        if (p == null || isBlank(p.id) || isBlank(p.password) || isBlank(p.nickname)// ||
-            //isBlank(p.identityPublicKey)
-        ) {
+        //if (p == null || isBlank(p.id) || isBlank(p.password) || isBlank(p.nickname) || isBlank(p.identityPublicKey)) {
+        if (p == null || isBlank(p.id) || isBlank(p.password) || isBlank(p.nickname)) {
+
             sendErr(msg.getSender(), "MISSING_FIELDS");
             return;
         }
@@ -51,7 +51,7 @@ public class AuthService {
         String hashPw = Hashing.sha256().hashString(p.password, StandardCharsets.UTF_8).toString();
 
         // 중복 아이디 체크 후 저장
-        boolean created = UserStore.putIfAbsent(p.id, hashPw, p.nickname,null);
+        boolean created = UserStore.putIfAbsent(p.id, hashPw, p.nickname, null);
         //boolean created = UserStore.putIfAbsent(p.id, hashPw, p.nickname,p.identityPublicKey);
         if (!created) { // 이미 존재
             sendErr(p.id, "DUPLICATE_ID");
