@@ -68,4 +68,37 @@ public final class IdentityKeys {
 
     }
 
+    /**
+     * 서버에 전달할 공개키(Base64 인코딩)를 반환합니다.
+     * 회원가입 바디에 "identityPublicKey"로 포함하세요.
+     *
+     * 예)
+     *   String pub = IdentityKeys.getPublicKeyBase64();
+     *   Map.of("id", id, "password", pw, "nickname", nick, "identityPublicKey", pub)
+     */
+    public static String getPublicKeyBase64() {
+        ensureGenerated(); // 필요 시 생성
+        // getEncoded() → SubjectPublicKeyInfo(ASN.1 DER) 바이트. Base64로 안전하게 직렬화.
+        return Base64.getEncoder().encodeToString(PUBLIC.getEncoded());
+    }
+
+    /**
+     * (다음 단계에서 사용할 예정)
+     *  - 에페메랄 키와 ECDH 수행/HKDF 파생 시 개인키 참조가 필요합니다.
+     *  - 현재는 메모리에서만 제공. 추후 파일 암호화 저장(PBKDF2+AES-GCM) 후 복호화해 로드 예정.
+     */
+    public static PrivateKey getPrivate() {
+        ensureGenerated();
+        return PRIVATE;
+    }
+
+
+    /**
+     * 공개키 객체가 필요할 때 사용(주로 디버깅/지문 비교 등).
+     */
+    public static PublicKey getPublic() {
+        ensureGenerated();
+        return PUBLIC;
+    }
+
 }
