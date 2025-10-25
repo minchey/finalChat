@@ -40,7 +40,10 @@ public class UserStore {
 
     /** 이미 존재하면 false, 신규 저장되면 true */
     public static boolean putIfAbsent(String id, String passwordHash, String nickname, String identityPublicKey) {
-        if (isBlank(id) || isBlank(passwordHash) || isBlank(identityPublicKey)) return false;
+        if (isBlank(id) || isBlank(passwordHash) ) return false;
+
+        // null이면 빈 문자열로 치환해 저장
+        if (identityPublicKey == null) identityPublicKey = "";
         UserRecord rec = UserRecord.of(id, passwordHash, nickname, identityPublicKey);
         rec.setIdentityPublicKey(identityPublicKey); // 🔥 추가 필드
         UserRecord prev = USERS.putIfAbsent(id, rec);
